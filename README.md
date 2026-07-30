@@ -51,7 +51,7 @@ Power BI Dashboard (3 pages)
 
 **Key Finding:**
 Champions segment (28% of customers) accounts for
-68% of total revenue at risk ($1.6M out of $2.33M)
+a large share of total revenue at risk ($3.89M total across all customers)
 
 ---
 
@@ -93,20 +93,62 @@ vs 2.85% for two-year contracts — 15x difference
 - Campaign ROI Simulator (3 scenarios)
 
 **Key Finding:**
-Total Revenue at Risk: $2,331,701
+Total Revenue at Risk: $3,886,229.33
 Top churn driver: Contract_Month-to-month (SHAP: +0.85)
+
+**Campaign ROI Simulator:**
+
+Customers are split into mutually exclusive pools by `Priority`
+(Critical, High, Medium/Low), sorted by `Revenue_at_Risk` descending.
+A test batch from each pool is run through a retention strategy with
+its own cost and expected retention rate:
+
+| Scenario | Strategy | Customers | Cost/Customer | Total Cost | Revenue at Risk (batch) | Retention Rate | Revenue Saved | Net Benefit | ROI |
+|---|---|---|---|---|---|---|---|---|---|
+| A — Critical | Personal Relationship Manager | 100 | $150 | $15,000 | $337,263.72 | 25% | $84,315.93 | $69,315.93 | 462.1% |
+| B — High | Discount Offer | 500 | $30 | $15,000 | $1,294,858.86 | 12% | $155,383.06 | $140,383.06 | 935.9% |
+| C — Medium/Low | Mass Email | 1,000 | $3 | $3,000 | $967,895.85 | 4% | $38,715.83 | $35,715.83 | 1190.5% |
+
+Note: these totals reflect only the sampled test batches (1,600 of
+7,032 customers), not the full $3.89M dataset-wide revenue at risk.
+
+ROI% alone is misleading when campaign budgets differ drastically —
+Scenario C's high ROI reflects its tiny cost base, not superior
+effectiveness. Comparing absolute net benefit shows Scenario B
+delivers the largest dollar impact ($140,383.06), while a tiered
+strategy — high-touch for Critical, mid-cost for High, low-cost mass
+outreach for Medium/Low — maximizes total net benefit across the
+customer base rather than optimizing for ROI% alone.
 
 ---
 
 ### SQL Business Queries
-**Notebook:** sql/business_queries.ipynb
+**Files:** `sql/build_db.py`, `sql/business_queries.sql`
 
-10 SQL queries covering:
+10 standalone SQL queries covering:
 - Overall and segment-level churn rates
 - Revenue at risk analysis
 - Customer prioritization
 - Retention strategy distribution
 - Campaign targeting
+
+**How it works:**
+`build_db.py` is a one-time setup script that loads `telco_churn_cleaned.csv`
+and `revenue_at_risk.csv` into a persistent SQLite file
+(`data/churn_analytics.db`). Once built, `business_queries.sql` runs
+independently against that file in any SQL client (DBeaver, DB Browser
+for SQLite, VS Code SQLTools, etc.) — no Python or notebook required.
+
+This SQL layer serves two purposes: it independently validates the
+revenue-at-risk and churn numbers computed in the Python pipeline
+(results matched, confirming data integrity across both approaches),
+and it demonstrates the ability to work directly in a pure-SQL
+environment, which is common in analyst roles with read-only database
+access.
+
+Python and SQL are used for what each does best — SQL for querying,
+aggregation, and validation; Python for machine learning, SHAP
+explainability, and statistical modeling that SQL cannot perform.
 
 ---
 
@@ -119,7 +161,7 @@ Top churn driver: Contract_Month-to-month (SHAP: +0.85)
 | Scikit-learn | Model training and evaluation |
 | XGBoost | Churn prediction model |
 | SHAP | Explainable AI |
-| SQLite | SQL business queries |
+| SQLite | Standalone SQL business queries |
 | Power BI | Interactive dashboard |
 | Jupyter Notebooks | Analysis and documentation |
 
@@ -146,8 +188,8 @@ Top churn driver: Contract_Month-to-month (SHAP: +0.85)
 3. **60 Critical customers identified**
    Average $980 revenue at risk each — need immediate personal outreach
 
-4. **$2.33M total revenue at risk**
-   Discount campaign targeting 500 customers saves $62,500 net at 416% ROI
+4. **$3.89M total revenue at risk**
+   Discount campaign targeting 500 customers saves $140,383 net at 935.9% ROI
 
 5. **Tuned XGBoost catches 80% of churners**
    Recall of 0.80 after class imbalance handling and hyperparameter tuning
@@ -180,7 +222,9 @@ customer-churn-platform/
 
 │   ├── telco_churn_cleaned.csv
 
-│   └── telco_churn_ml_ready.csv
+│   ├── telco_churn_ml_ready.csv
+
+│   └── churn_analytics.db      *(generated locally, gitignored)*
 
 ├── module1_segmentation/
 
@@ -210,7 +254,9 @@ customer-churn-platform/
 
 ├── sql/
 
-│   └── business_queries.ipynb
+│   ├── build_db.py
+
+│   └── business_queries.sql
 
 ├── outputs/
 
@@ -265,9 +311,15 @@ module2_churn_prediction/05 → 06 → 07
 
 module3_explainability/08 → 09 → 10
 
-sql/business_queries
+**Step 6 — Build the SQL database and run business queries**
+```bash
+cd sql
+python build_db.py
+```
+Then open `business_queries.sql` in any SQL client, connect to
+`data/churn_analytics.db`, and run the queries directly.
 
-**Step 6 — Open Power BI dashboard**
+**Step 7 — Open Power BI dashboard**
 powerbi/churn_dashboard.pbix
 
 ---
