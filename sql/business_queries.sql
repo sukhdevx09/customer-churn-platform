@@ -49,7 +49,7 @@ FROM customers
 ORDER BY CLV_Enhanced DESC
 LIMIT 10;
 
--- Result: Champions dominate top 10 — avg CLV $4,919
+-- Result: Champions dominate top 10 — avg CLV $8,578
 
 -- Query 4: Revenue at Risk by Segment
 -- Business Question: Where is most revenue at risk?
@@ -64,7 +64,7 @@ FROM customers
 GROUP BY Segment
 ORDER BY Total_Revenue_at_Risk DESC;
 
--- Result: Champions carry $1.6M (68%) of total $2.33M revenue at risk
+-- Result: Champions carry $2.70M (69%) of total $3.89M revenue at risk
 
 -- Query 5: High Risk Customers by Segment
 -- Business Question: Where are high risk customers concentrated?
@@ -79,7 +79,7 @@ WHERE Risk_Label = 'High Risk'
 GROUP BY Segment, Risk_Label
 ORDER BY Total_Revenue_at_Risk DESC;
 
--- Result: At Risk segment has highest concentration of high risk customers
+-- Result: Champions (237 customers, $548,735), and Loyal Customers has 407
 
 -- Query 6: Average Monthly Charges by Churn Status
 -- Business Question: Do churners pay more than non-churners?
@@ -108,7 +108,7 @@ FROM customers
 GROUP BY Retention_Strategy
 ORDER BY Total_Revenue_at_Risk DESC;
 
--- Result: Personal RM needed for 60 critical customers
+-- Result: Personal RM needed for 463 critical customers
 
 -- Query 8: Priority Customer Summary
 -- Business Question: How many customers in each priority level?
@@ -129,7 +129,7 @@ ORDER BY
         WHEN 'Low' THEN 4
     END;
 
--- Result: 60 Critical ($980 avg) | 1,144 High ($760 avg)
+-- Result: 463 Critical ($1,718 avg) | 2,127 High ($854 avg)
 
 -- Query 9: Top 10 Customers by Revenue at Risk
 -- Business Question: Who should we target first?
@@ -163,4 +163,4 @@ FROM customers
 GROUP BY CLV_Tier
 ORDER BY Churn_Rate_Pct DESC;
 
--- Result: Premium tier shows 15% churn — high value customers not immune
+-- Result: Low Value tier churns most (40.56%), Premium least (15.07%); churn decreases as CLV increases.
