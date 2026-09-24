@@ -34,7 +34,7 @@ Module 3 — Explainable AI & Revenue Protection
 
 ↓
 
-Power BI Dashboard (3 pages)
+Analytics Outputs (CSV files for BI tools)
 
 ---
 
@@ -51,7 +51,7 @@ Power BI Dashboard (3 pages)
 
 **Key Finding:**
 Champions segment (28% of customers) accounts for
-a large share of total revenue at risk ($3.89M total across all customers)
+$2.70M of the $3.89M total revenue at risk (about 69%)
 
 ---
 
@@ -139,12 +139,14 @@ and `revenue_at_risk.csv` into a persistent SQLite file
 independently against that file in any SQL client (DBeaver, DB Browser
 for SQLite, VS Code SQLTools, etc.) — no Python or notebook required.
 
-This SQL layer serves two purposes: it independently validates the
-revenue-at-risk and churn numbers computed in the Python pipeline
-(results matched, confirming data integrity across both approaches),
-and it demonstrates the ability to work directly in a pure-SQL
-environment, which is common in analyst roles with read-only database
-access.
+This SQL layer serves two purposes: it re-derives several of the
+Python pipeline's results (overall churn, churn by contract, revenue
+at risk by segment, priority summary, churn by CLV tier) as a
+validation step, with the SQL output matching the Python output,
+and it adds new views not in the notebooks (high-risk customers by
+segment, average charges and tenure by churn status). It also
+demonstrates the ability to work directly in a pure-SQL environment,
+which is common in analyst roles with read-only database access.
 
 Python and SQL are used for what each does best — SQL for querying,
 aggregation, and validation; Python for machine learning, SHAP
@@ -162,7 +164,6 @@ explainability, and statistical modeling that SQL cannot perform.
 | XGBoost | Churn prediction model |
 | SHAP | Explainable AI |
 | SQLite | Standalone SQL business queries |
-| Power BI | Interactive dashboard |
 | Jupyter Notebooks | Analysis and documentation |
 
 ---
@@ -182,34 +183,17 @@ explainability, and statistical modeling that SQL cannot perform.
 1. **Contract type is the #1 churn driver**
    Month-to-month customers churn 15x more than two-year customers
 
-2. **Champions drive 68% of revenue at risk**
-   Despite being only 28% of customers
+2. **Champions drive 69% of revenue at risk**
+   $2.70M of $3.89M, despite being only 28% of customers
 
-3. **60 Critical customers identified**
-   Average $980 revenue at risk each — need immediate personal outreach
+3. **463 Critical customers identified**
+   Average $1,718 revenue at risk each — need immediate personal outreach
 
 4. **$3.89M total revenue at risk**
    Discount campaign targeting 500 customers saves $140,383 net at 935.9% ROI
 
 5. **Tuned XGBoost catches 80% of churners**
    Recall of 0.80 after class imbalance handling and hyperparameter tuning
-
----
-
-## Power BI Dashboard
-
-3-page interactive dashboard:
-
-**Page 1 — Customer Intelligence**
-Segment distribution, CLV analysis, revenue by segment
-
-**Page 2 — Churn Risk**
-Risk scoring, priority matrix, CLV vs churn scatter plot,
-high risk customer list with retention strategies
-
-**Page 3 — Revenue Protection**
-Revenue at risk analysis, critical customer action list,
-SHAP feature importance, campaign ROI scenarios
 
 ---
 
@@ -272,10 +256,6 @@ customer-churn-platform/
 
 │   └── shap_plots/
 
-├── powerbi/
-
-│   └── churn_dashboard.pbix
-
 └── requirements.txt
 
 ---
@@ -318,9 +298,6 @@ python build_db.py
 ```
 Then open `business_queries.sql` in any SQL client, connect to
 `data/churn_analytics.db`, and run the queries directly.
-
-**Step 7 — Open Power BI dashboard**
-powerbi/churn_dashboard.pbix
 
 ---
 
